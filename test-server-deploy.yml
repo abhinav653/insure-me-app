@@ -1,0 +1,28 @@
+---
+- hosts: test_server
+  become: true
+  tasks:
+    - name: Update cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker on test server
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Ensure Docker is in the system group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Deploy the insure-me app
+      command: docker run -d -p 8081:8081 abhinav653/insure-me:1.0
+
